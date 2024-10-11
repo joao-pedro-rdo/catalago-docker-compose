@@ -1,0 +1,33 @@
+volumes:
+  lldap_data:
+    driver: local
+
+services:
+  lldap:
+    image: lldap/lldap:stable
+    ports:
+      # Expondo as portas do LLDAP
+      # Para o LDAP, não é recomendado expor diretamente
+      # - "3890:3890"
+      # Para LDAPS (LDAP sobre SSL), habilite a porta se LLDAP_LDAPS_OPTIONS__ENABLED estiver definida como true
+      # - "6360:6360"
+      # Para o front-end web
+      - "17170:17170"  # Porta para acessar a interface web do LLDAP
+    volumes:
+      - "lldap_data:/data"  # Persistência dos dados do LLDAP
+      # Alternativamente, você pode montar uma pasta local
+      # - "./lldap_data:/data"
+    environment:
+      - UID=1000  # Substitua pelo UID do usuário
+      - GID=1000  # Substitua pelo GID do grupo
+      - TZ=America/Sao_Paulo  # Ajuste para o seu fuso horário
+      - LLDAP_JWT_SECRET=REPLACE_WITH_RANDOM  # Gere uma string aleatória para o JWT
+      - LLDAP_KEY_SEED=REPLACE_WITH_RANDOM  # Gere uma string aleatória para a chave
+      - LLDAP_LDAP_BASE_DN=dc=example,dc=com  # Substitua pelo seu DN base
+      # Se usar LDAPS, habilite e configure cert e chave
+      # - LLDAP_LDAPS_OPTIONS__ENABLED=true
+      # - LLDAP_LDAPS_OPTIONS__CERT_FILE=/path/to/certfile.crt
+      # - LLDAP_LDAPS_OPTIONS__KEY_FILE=/path/to/keyfile.key
+      # Você também pode definir um banco de dados diferente:
+      # - LLDAP_DATABASE_URL=mysql://mysql-user:password@mysql-server/my-database
+      # - LLDAP_DATABASE_URL=postgres://postgres-user:password@postgres-server/my-database
